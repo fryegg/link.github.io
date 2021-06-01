@@ -27,17 +27,17 @@ function search(id, url) {
         var rows = results.rows;
         len = rows.length;
         msg = "<p>Found rows: " + len + "</p>";
-        document.querySelector('#status').innerHTML += msg;
-        if (len == 0){
+        //document.querySelector('#status').innerHTML += msg;
+        if (len == 0) {
           tx.executeSql("INSERT INTO LOGS values(?,?,?,?)", [0, url, wordnum, Date.now()]);
         }
-        else{
-          tx.executeSql("INSERT INTO LOGS values(?,?,?,?)", [rows[len-1].id + 1, url, wordnum, Date.now()]);
+        else {
+          tx.executeSql("INSERT INTO LOGS values(?,?,?,?)", [rows[len - 1].id + 1, url, wordnum, Date.now()]);
         }
         //tx.executeSql('UPDATE LOGS SET log = (?) WHERE id = (?)',[url,0]);
       }, null);
       //msg = '<p>Log message created and row inserted.</p>';
-      //document.querySelector('#status').innerHTML = url;
+      document.querySelector('#status').innerHTML = wordnum;
     });
   });
 }
@@ -51,9 +51,9 @@ function delete_by_time() {
       var len = rows.length;
       for (var i = 0; i < len; i++) {
         var cur_item = rows[i]; // or u can use the item methid ---> var cur_item = rows.item(i);
-        var lapse = (Date.now() - cur_item.time)/1000
+        var lapse = (Date.now() - cur_item.time) / 1000
         // over 30 seconds
-        if(lapse>60){
+        if (lapse > 60) {
           console.log("hey bye!!!");
           tx.executeSql('DELETE FROM LOGS WHERE id=?', [cur_item.id]);
         }
@@ -65,15 +65,36 @@ function delete_by_time() {
   setTimeout(delete_by_time, 10000);
 }
 
+function wordnum_to_url(id, url) {
+  var db = openDatabase('mydb', '1.0', 'Test DB', 2 * 1024 * 1024);
+  db.transaction(function (tx) {
+    tx.executeSql('SELECT url FROM LOGS WHERE wordnum LIKE ?', [url], function (tx, results) {
+      console.log(results);
+      var rows = results.rows;
+      document.querySelector('#status2').innerHTML = rows[0].url;
+    }, null);
+  });
+}
+
 function listen() {
   //press enter
   var id = 0;
   var input = document.getElementById("myInput");
+  var input2 = document.getElementById("myInput2");
   input.addEventListener("keyup", function (event) {
     //console.log(event.key)
     if (event.key === 'Enter') {
       event.preventDefault();
       search(id, input.value);
+      id = id + 1;
+    }
+  });
+  input2.addEventListener("keyup", function (event) {
+    //console.log(event.key)
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      console.log(input2.value);
+      wordnum_to_url(id, input2.value);
       id = id + 1;
     }
   });
