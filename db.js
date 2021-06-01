@@ -3,8 +3,6 @@ var db = openDatabase('mydb', '1.0', 'Test DB', 2 * 1024 * 1024);
 function insert_tx(tx) {
     var msg;
     tx.executeSql('CREATE TABLE IF NOT EXISTS LOGS (id unique, log)');
-    tx.executeSql('INSERT INTO LOGS (id, log) VALUES (1, "foobar")');
-    tx.executeSql('INSERT INTO LOGS (id, log) VALUES (2, "logmsg")');
     msg = '<p>Log message created and row inserted.</p>';
     document.querySelector('#status').innerHTML = msg;
 }

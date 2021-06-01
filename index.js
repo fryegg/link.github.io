@@ -2,19 +2,68 @@
 //import { insert_tx } from 'db.js';
 //import { read_tx } from './db.js';
 //button click
-function search(id, text) {
+function random_word(callback) {
+  var request = new XMLHttpRequest()
+  fetch("https://random-word-api.herokuapp.com/word?number=1")
+    .then((response) => response.json())
+    .then((data) => {
+      callback(data[0]);
+    });
+}
+
+function search(id, url) {
   var db = openDatabase('mydb', '1.0', 'Test DB', 2 * 1024 * 1024);
   var msg;
   var ids = "" + id;
-  db.transaction(function (tx) {
-    tx.executeSql('CREATE TABLE IF NOT EXISTS LOGS (id unique, log)');
-    console.log(ids);
-    tx.executeSql("INSERT INTO LOGS values(?,?)",[ids,text]);
-    msg = '<p>Log message created and row inserted.</p>';
-    document.querySelector('#status').innerHTML = text;
+  var len;
+  var wordnum;
+  var word = ""
+  random_word(function (word) {
+    num = Math.floor(Math.random() * 100);
+    wordnum = word + num.toString()
+    db.transaction(function (tx) {
+      tx.executeSql('CREATE TABLE IF NOT EXISTS LOGS (id unique, url, wordnum, time)');
+      tx.executeSql('SELECT * FROM LOGS', [], function (tx, results) {
+        var rows = results.rows;
+        len = rows.length;
+        msg = "<p>Found rows: " + len + "</p>";
+        document.querySelector('#status').innerHTML += msg;
+        if (len == 0){
+          tx.executeSql("INSERT INTO LOGS values(?,?,?,?)", [0, url, wordnum, Date.now()]);
+        }
+        else{
+          tx.executeSql("INSERT INTO LOGS values(?,?,?,?)", [rows[len-1].id + 1, url, wordnum, Date.now()]);
+        }
+        //tx.executeSql('UPDATE LOGS SET log = (?) WHERE id = (?)',[url,0]);
+      }, null);
+      //msg = '<p>Log message created and row inserted.</p>';
+      //document.querySelector('#status').innerHTML = url;
+    });
   });
 }
 
+function delete_by_time() {
+  var db = openDatabase('mydb', '1.0', 'Test DB', 2 * 1024 * 1024);
+  db.transaction(function (tx) {
+    tx.executeSql('CREATE TABLE IF NOT EXISTS LOGS (id unique, url, wordnum, time)');
+    tx.executeSql('SELECT * FROM LOGS', [], function (tx, results) {
+      var rows = results.rows;
+      var len = rows.length;
+      for (var i = 0; i < len; i++) {
+        var cur_item = rows[i]; // or u can use the item methid ---> var cur_item = rows.item(i);
+        var lapse = (Date.now() - cur_item.time)/1000
+        // over 30 seconds
+        if(lapse>60){
+          console.log("hey bye!!!");
+          tx.executeSql('DELETE FROM LOGS WHERE id=?', [cur_item.id]);
+        }
+        //console.log("the id is : " + cur_item.id + " the data is : " + cur_item.url);
+      }
+      //tx.executeSql('UPDATE LOGS SET log = (?) WHERE id = (?)',[url,0]);
+    }, null);
+  });
+  setTimeout(delete_by_time, 10000);
+}
 
 function listen() {
   //press enter
@@ -24,10 +73,11 @@ function listen() {
     //console.log(event.key)
     if (event.key === 'Enter') {
       event.preventDefault();
-      search(id ,input.value);
-      id = id+1;
+      search(id, input.value);
+      id = id + 1;
     }
   });
+  delete_by_time();
 }
 
 listen();
