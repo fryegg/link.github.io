@@ -93,12 +93,23 @@ function listen() {
     //console.log(event.key)
     if (event.key === 'Enter') {
       event.preventDefault();
-      console.log(input2.value);
       wordnum_to_url(id, input2.value);
       id = id + 1;
     }
   });
-  delete_by_time();
 }
 
+function button1() {
+  var id = 0;
+  var input = document.getElementById("myInput");
+  search(id, input.value);
+  id = id + 1;
+}
+function button2() {
+  var id = 0;
+  var input2 = document.getElementById("myInput2");
+  wordnum_to_url(id, input2.value);
+  id = id + 1;
+}
 listen();
+delete_by_time();
