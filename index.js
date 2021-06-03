@@ -2,6 +2,12 @@
 //import { insert_tx } from 'db.js';
 //import { read_tx } from './db.js';
 //button click
+function isURL(str) {
+  var regex = /(http|https):\/\/(\w+:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
+  var pattern = new RegExp(regex); 
+return pattern.test(str);
+}
+
 function random_word(callback) {
   var request = new XMLHttpRequest()
   fetch("https://random-word-api.herokuapp.com/word?number=1")
