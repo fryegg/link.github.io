@@ -59,7 +59,7 @@ function delete_by_time() {
         var cur_item = rows[i]; // or u can use the item methid ---> var cur_item = rows.item(i);
         var lapse = (Date.now() - cur_item.time) / 1000
         // over 30 seconds
-        if (lapse > 60) {
+        if (lapse > 300) {
           console.log("hey bye!!!");
           tx.executeSql('DELETE FROM LOGS WHERE id=?', [cur_item.id]);
         }
