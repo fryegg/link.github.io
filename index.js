@@ -2,6 +2,7 @@
 //import { insert_tx } from 'db.js';
 //import { read_tx } from './db.js';
 //button click
+import { CRUD } from './server.js';
 function isURL(str) {
   var regex = /(http|https):\/\/(\w+:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
   var pattern = new RegExp(regex); 
@@ -117,5 +118,10 @@ function button2() {
   wordnum_to_url(id, input2.value);
   id = id + 1;
 }
+//crud = new CRUD('./nomad_project.db');
+//crud.created();
+//crud.inserted('naver.com', 'helloworld02');
+//crud.readed('helloworld02')
 listen();
 delete_by_time();
+server();
